@@ -1,5 +1,5 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'beranda_page.dart';
 import 'daftar_anggota_page.dart';
 import 'video_page.dart';
@@ -16,18 +16,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter UI Modern',
+      title: 'WeStand - Kelompok II',
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.system,
       theme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: Colors.blueAccent,
-        brightness: Brightness.light,
-      ),
-      darkTheme: ThemeData(
-        useMaterial3: true,
-        colorSchemeSeed: Colors.blueAccent,
         brightness: Brightness.dark,
+        useMaterial3: true,
+        fontFamily: 'Poppins',
+        scaffoldBackgroundColor: Colors.transparent,
       ),
       home: const HomePage(),
     );
@@ -54,57 +49,95 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 3,
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        title: const Text(
-          'Program Flutter UI',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              "https://lms.teknikunsur.net/pluginfile.php/1/theme_moove/logo/1681706361/icon_B_bg.jpg",
-              fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) =>
-                  const Icon(Icons.error, color: Colors.red),
+    return Stack(
+      children: [
+        // 🌈 Background gradasi seragam semua halaman
+        Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
           ),
         ),
-      ),
 
-      // 🌈 animasi transisi antar halaman
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 400),
-        transitionBuilder: (child, animation) => FadeTransition(
-          opacity: animation,
-          child: child,
+        Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(
+            backgroundColor: Colors.black.withOpacity(0.3),
+            elevation: 0,
+            centerTitle: true,
+            flexibleSpace: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(color: Colors.black.withOpacity(0.2)),
+              ),
+            ),
+            title: const Text(
+              ' WeStand ',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 22,
+                color: Colors.white,
+                letterSpacing: 1.2,
+              ),
+            ),
+            leading: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: Image.asset(
+                  'assets/images/logo.jpg', // ganti dengan nama file logomu di assets/images/
+                  fit: BoxFit.cover,
+                )
+              ),
+            ),
+          ),
+
+          // ✨ Transisi antar halaman halus
+          body: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 500),
+            transitionBuilder: (child, animation) =>
+                FadeTransition(opacity: animation, child: child),
+            child: _pages[_selectedIndex],
+          ),
+
+          // 🚀 Navigasi bawah dengan efek blur & warna senada
+          bottomNavigationBar: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(25),
+              topRight: Radius.circular(25),
+            ),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+              child: NavigationBar(
+                animationDuration: const Duration(milliseconds: 400),
+                backgroundColor: Colors.black.withOpacity(0.3),
+                height: 70,
+                indicatorColor: Colors.blueAccent.withOpacity(0.4),
+                labelBehavior:
+                    NavigationDestinationLabelBehavior.onlyShowSelected,
+                selectedIndex: _selectedIndex,
+                onDestinationSelected: (index) =>
+                    setState(() => _selectedIndex = index),
+                destinations: const [
+                  NavigationDestination(
+                      icon: Icon(Icons.home_outlined), label: 'Beranda'),
+                  NavigationDestination(
+                      icon: Icon(Icons.group_outlined), label: 'Anggota'),
+                  NavigationDestination(
+                      icon: Icon(Icons.video_library_outlined), label: 'Video'),
+                  NavigationDestination(
+                      icon: Icon(Icons.fastfood_outlined), label: 'Makanan'),
+                  NavigationDestination(
+                      icon: Icon(Icons.account_circle_outlined), label: 'Akun'),
+                ],
+              ),
+            ),
+          ),
         ),
-        child: _pages[_selectedIndex],
-      ),
-
-      // ✨ navigasi bawah bergaya modern
-      bottomNavigationBar: NavigationBar(
-        animationDuration: const Duration(milliseconds: 400),
-        height: 70,
-        elevation: 3,
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() => _selectedIndex = index);
-        },
-        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home), label: 'Beranda'),
-          NavigationDestination(icon: Icon(Icons.group), label: 'Anggota'),
-          NavigationDestination(icon: Icon(Icons.video_library), label: 'Video'),
-          NavigationDestination(icon: Icon(Icons.fastfood), label: 'Makanan'),
-          NavigationDestination(icon: Icon(Icons.account_circle), label: 'Akun'),
-        ],
-      ),
+      ],
     );
   }
 }

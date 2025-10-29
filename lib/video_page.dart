@@ -1,95 +1,169 @@
 import 'package:flutter/material.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class VideoPage extends StatefulWidget {
+class VideoPage extends StatelessWidget {
   const VideoPage({super.key});
 
-  @override
-  State<VideoPage> createState() => _VideoPageState();
-}
-
-class _VideoPageState extends State<VideoPage> {
-  final List<String> videoUrls = const [
-    // 🎥 Video YouTube bertema kemanusiaan
-    'https://www.youtube.com/watch?v=vfLQ_KzHdlk', // Humanity documentary
-    'https://www.youtube.com/watch?v=2PFKUoNyYx8', // UNICEF - helping children
-    'https://www.youtube.com/watch?v=qg6wXb0W3S0', // Acts of kindness
-    'https://www.youtube.com/watch?v=tgGxPwK5e6o', // Peace & humanity
-    'https://www.youtube.com/watch?v=2vKz7WnU83E', // Volunteering story
-    'https://www.youtube.com/watch?v=KzZ0xWm2Tgc', // Helping the poor
-    'https://www.youtube.com/watch?v=RsfEgzJZ2OQ', // Humanity in crisis
-    'https://www.youtube.com/watch?v=dXrVqUeYFqM', // Compassion short film
-    'https://www.youtube.com/watch?v=UIp6_0kct_U', // Hope and peace
-    'https://www.youtube.com/watch?v=6U2ZVJrA_n4', // Kindness compilation
+  final List<Map<String, String>> videos = const [
+    {
+      'judul': 'Kemanusiaan di Gaza',
+      'url': 'https://youtu.be/wccPO8GxWR0?si=Wz9ewftdC7bBsNjK',
+      'thumbnail': 'https://img.youtube.com/vi/wccPO8GxWR0/0.jpg'
+    },
+    {
+      'judul': 'Kemanusiaan Dunia',
+      'url': 'https://youtu.be/PsJtuDrHDp8?si=gHnbZvlkht98hLwt',
+      'thumbnail': 'https://img.youtube.com/vi/PsJtuDrHDp8/0.jpg'
+    },
+    {
+      'judul': 'Aksi Relawan di Konflik Dunia',
+      'url': 'https://youtu.be/9jI0_InROwY?si=Kcej3JZ3Z117a8I_',
+      'thumbnail': 'https://img.youtube.com/vi/9jI0_InROwY/0.jpg'
+    },
+    {
+      'judul': 'Solidaritas untuk Dunia',
+      'url': 'https://youtu.be/2Bi9gUWiE4A?si=znsJt4EXaLoaQxJI',
+      'thumbnail': 'https://img.youtube.com/vi/2Bi9gUWiE4A/0.jpg'
+    },
+    {
+      'judul': 'Aksi Peduli Sesama',
+      'url': 'https://youtu.be/y5aYT90RiGE?si=gvGewtrTViiOXKmx',
+      'thumbnail': 'https://img.youtube.com/vi/y5aYT90RiGE/0.jpg'
+    },
+    {
+      'judul': 'Dunia Tanpa Perang',
+      'url': 'https://youtu.be/As67nnwVnIU?si=chKLZ-rIv-baZR1-',
+      'thumbnail': 'https://img.youtube.com/vi/As67nnwVnIU/0.jpg'
+    },
+    {
+      'judul': 'Semangat Kemanusiaan',
+      'url': 'https://youtu.be/rGTbJssfVoI?si=CXp_xdj9t0kW-OGX',
+      'thumbnail': 'https://img.youtube.com/vi/rGTbJssfVoI/0.jpg'
+    },
+    {
+      'judul': 'Berbagi untuk Dunia',
+      'url': 'https://youtu.be/8NOGkJWm9Dk?si=93VeGdkgq1_5oR8s',
+      'thumbnail': 'https://img.youtube.com/vi/8NOGkJWm9Dk/0.jpg'
+    },
+    {
+      'judul': 'Donasi Kemanusiaan',
+      'url': 'https://youtu.be/WhjtnNaDn08?si=lwoNrlvbqsvqn8-H',
+      'thumbnail': 'https://img.youtube.com/vi/WhjtnNaDn08/0.jpg'
+    },
+    {
+      'judul': 'Bersatu dalam Kebaikan',
+      'url': 'https://youtu.be/0Nh61ktP90c?si=4bBhsdv62KOZ55o8',
+      'thumbnail': 'https://img.youtube.com/vi/0Nh61ktP90c/0.jpg'
+    },
   ];
 
-  String? _selectedVideoId;
+  // Fungsi buka link di YouTube / browser
+  Future<void> _launchVideo(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Tidak bisa membuka URL: $url';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return _selectedVideoId == null
-        ? GridView.builder(
-            padding: const EdgeInsets.all(16),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-            ),
-            itemCount: videoUrls.length,
-            itemBuilder: (context, index) {
-              final url = videoUrls[index];
-              final videoId = YoutubePlayer.convertUrlToId(url)!;
-              final thumbnail = 'https://img.youtube.com/vi/$videoId/0.jpg';
-
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    _selectedVideoId = videoId;
-                  });
-                },
-                child: Card(
-                  clipBehavior: Clip.antiAlias,
-                  elevation: 5,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Image.network(
-                        thumbnail,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        height: double.infinity,
-                      ),
-                      Container(
-                        color: Colors.black38,
-                        child: const Icon(Icons.play_circle_fill,
-                            color: Colors.white, size: 60),
-                      ),
-                    ],
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          'Video Kemanusiaan',
+          style: GoogleFonts.poppins(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFF0F2027), Color(0xFF203A43), Color(0xFF2C5364)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: GridView.builder(
+          padding: const EdgeInsets.fromLTRB(16, 100, 16, 20),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 14,
+            mainAxisSpacing: 14,
+            childAspectRatio: 16 / 10,
+          ),
+          itemCount: videos.length,
+          itemBuilder: (context, index) {
+            final video = videos[index];
+            return InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () => _launchVideo(video['url']!),
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.network(
+                      video['thumbnail']!,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                      loadingBuilder: (context, child, progress) {
+                        if (progress == null) return child;
+                        return Container(
+                          color: Colors.black26,
+                          child: const Center(
+                            child:
+                                CircularProgressIndicator(color: Colors.white),
+                          ),
+                        );
+                      },
+                    ),
                   ),
-                ),
-              );
-            },
-          )
-        : Scaffold(
-            appBar: AppBar(
-              title: const Text("Tonton Video"),
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back),
-                onPressed: () => setState(() => _selectedVideoId = null),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      color: Colors.black38,
+                    ),
+                  ),
+                  const Center(
+                    child: Icon(Icons.play_circle_fill,
+                        color: Colors.white, size: 60),
+                  ),
+                  Positioned(
+                    top: 8,
+                    left: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 4, horizontal: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Video ${index + 1}',
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 12,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            body: YoutubePlayer(
-              controller: YoutubePlayerController(
-                initialVideoId: _selectedVideoId!,
-                flags: const YoutubePlayerFlags(
-                  autoPlay: true,
-                  mute: false,
-                ),
-              ),
-              showVideoProgressIndicator: true,
-            ),
-          );
+            );
+          },
+        ),
+      ),
+    );
   }
 }
